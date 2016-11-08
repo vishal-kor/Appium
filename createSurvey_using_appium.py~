@@ -1,0 +1,309 @@
+# Using appium webdriver to automate
+from appium import webdriver
+
+# Using selenium webdriver only for Waits/Timeouts
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
+
+# Importing setlog file for logging purpose
+from setlog import setLogger
+import time
+
+logger = setLogger('logs')
+
+# Testcase 1 : This testcase will sign-in and create survey with 4 questions
+def test_createSurveyWithFiveQuestions():
+    # create dictionary for capabilities
+    desired_caps = {}
+    desired_caps['platformName'] = 'Android'
+    desired_caps['platformVersion'] = '5.1.1'
+    desired_caps['deviceName'] = 'Android emulator'
+    desired_caps['appPackage'] = 'com.surveymonkey'
+    desired_caps['appActivity'] = 'com.surveymonkey.login.activities.LandingActivity'
+
+    # Set up connection with hub (grid) / appium server
+    driver = webdriver.Remote('http://localhost:4444/wd/hub', desired_caps)
+
+    logger.info("Executing Testcase 1...........")
+    logger.info("Signing in..........")
+
+    # Code for User sign in
+    # waiting for sign in button
+    try:
+        visible = expected_conditions.presence_of_element_located(
+            (By.ID, "com.surveymonkey:id/sign_in_button"))
+        WebDriverWait(driver, 30).until(visible)
+    except TimeoutException:
+        logger.error("Unable to find sign in button.")
+    driver.find_element_by_id("com.surveymonkey:id/sign_in_button").click()
+    driver.find_element_by_id("com.surveymonkey:id/username_input").send_keys("InfoBeansP")
+    driver.find_element_by_id("com.surveymonkey:id/password_input").send_keys("InfoBeans!@#")
+    driver.find_element_by_id("com.surveymonkey:id/sign_in_button").click()
+
+    # waiting for create survey button
+    try:
+        visible = expected_conditions.presence_of_element_located(
+            (By.XPATH, "//android.widget.Button[@content-desc='CREATE SURVEY']"))
+        WebDriverWait(driver, 30).until(visible)
+    except TimeoutException:
+        logger.error("Unable to load a surveymonkey app.")
+
+    # create survey
+    driver.find_element_by_xpath("//android.widget.Button[@content-desc='CREATE SURVEY']").click()
+    driver.find_element_by_xpath("//android.widget.Button[@text='New Survey']").click()
+    driver.find_element_by_id("com.surveymonkey:id/input_field").clear()
+    driver.find_element_by_id("com.surveymonkey:id/input_field").send_keys("Survey 1")
+    driver.find_element_by_xpath("//android.widget.Button[@text='Create']").click()
+    logger.info("Survey Created")
+
+    # Question 1 : Text type
+    # waiting for + button
+    try:
+        visible = expected_conditions.presence_of_element_located(
+            (By.ID, "com.surveymonkey:id/floating_action_main_container_big"))
+        WebDriverWait(driver, 20).until(visible)
+    except TimeoutException:
+        print "Unable find question container (+)"
+    driver.find_element_by_id("com.surveymonkey:id/floating_action_main_container_big").click()
+    time.sleep(1)
+    driver.find_element_by_xpath("//android.widget.TextView[@text='Text']").click()
+    driver.find_element_by_class_name("android.widget.EditText").send_keys("A survey about Infobeans")
+    driver.find_element_by_id("com.surveymonkey:id/action_save").click()
+    logger.info("Added text type of question")
+
+    # Question 2 : Comment box
+    # waiting for + button
+    try:
+        visible = expected_conditions.presence_of_element_located(
+            (By.ID, "com.surveymonkey:id/floating_action_main_container_big"))
+        WebDriverWait(driver, 20).until(visible)
+    except TimeoutException:
+        print "Unable find question container (+)"
+    driver.find_element_by_id("com.surveymonkey:id/floating_action_main_container_big").click()
+    time.sleep(1)
+    driver.find_element_by_xpath("//android.widget.TextView[@text='Comment Box']").click()
+    driver.find_element_by_class_name("android.widget.EditText").send_keys("Tell us about infobeans")
+    driver.find_element_by_id("com.surveymonkey:id/action_save").click()
+    logger.info("Added Comment box type of question")
+
+
+    # Question 3 : dropdown
+    # waiting for + button
+    try:
+        visible = expected_conditions.presence_of_element_located(
+            (By.ID, "com.surveymonkey:id/floating_action_main_container_big"))
+        WebDriverWait(driver, 20).until(visible)
+    except TimeoutException:
+        print "Unable find question container (+)"
+    driver.find_element_by_id("com.surveymonkey:id/floating_action_main_container_big").click()
+    try:
+        visible = expected_conditions.presence_of_element_located(
+            (By.XPATH, "//android.widget.TextView[@text='Dropdown']"))
+        WebDriverWait(driver, 20).until(visible)
+    except TimeoutException:
+        print "Timed out waiting for page to load"
+    driver.find_element_by_xpath("//android.widget.TextView[@text='Dropdown']").click()
+    time.sleep(1)
+    driver.find_element_by_xpath("//android.widget.EditText[@index='0']").send_keys("Are you a tester?")
+    driver.hide_keyboard()
+    driver.find_element_by_xpath("//android.widget.EditText[@index='1']").send_keys("Yes")
+    driver.hide_keyboard()
+    time.sleep(2)
+    driver.find_element_by_xpath("//android.webkit.WebView[@content-desc='Survey Monkey']/android.view.View[5]/android.view.View[1]/android.widget.EditText").send_keys("No")
+    driver.hide_keyboard()
+    driver.find_element_by_id("com.surveymonkey:id/action_save").click()
+    logger.info("Added Dropdown type of question")
+
+    # Question 4 : Matrix / Rating
+    # waiting for + button
+    try:
+        visible = expected_conditions.presence_of_element_located(
+            (By.ID, "com.surveymonkey:id/floating_action_main_container_big"))
+        WebDriverWait(driver, 20).until(visible)
+    except TimeoutException:
+        print "Unable find question container (+)"
+    driver.find_element_by_id("com.surveymonkey:id/floating_action_main_container_big").click()
+    time.sleep(1)
+    driver.find_element_by_xpath("//android.widget.TextView[@text='Matrix / Rating']").click()
+    time.sleep(1)
+    driver.find_element_by_class_name("android.widget.EditText").send_keys("Best feature of SM")
+    driver.find_element_by_xpath("//android.view.View[@content-desc='Rows']").click()
+    try:
+        visible = expected_conditions.presence_of_element_located(
+            (By.XPATH, "//android.webkit.WebView[@content-desc='Survey Monkey']/android.view.View[3]/android.view.View[1]/android.widget.EditText"))
+        WebDriverWait(driver, 20).until(visible)
+    except TimeoutException:
+        print "Timed out waiting for page to load"
+
+    driver.find_element_by_xpath(
+        "//android.webkit.WebView[@content-desc='Survey Monkey']/android.view.View[3]/android.view.View[1]/android.widget.EditText"
+    ).clear()
+    time.sleep(2)
+    driver.find_element_by_xpath(
+        "//android.webkit.WebView[@content-desc='Survey Monkey']/android.view.View[3]/android.view.View[1]/android.widget.EditText"
+    ).send_keys("Interface")
+    driver.find_element_by_xpath(
+        "//android.webkit.WebView[@content-desc='Survey Monkey']/android.view.View[4]/android.view.View[1]/android.widget.EditText"
+    ).clear()
+    driver.find_element_by_xpath(
+        "//android.webkit.WebView[@content-desc='Survey Monkey']/android.view.View[4]/android.view.View[1]/android.widget.EditText"
+    ).send_keys("Survey design")
+    driver.find_element_by_id("com.surveymonkey:id/action_save").click()
+    driver.find_element_by_id("com.surveymonkey:id/action_save").click()
+    logger.info("Added Matrix/Rating type of question")
+
+    # Verify survey in preview
+    logger.info("Verifying survey is created......")
+    try:
+        visible = expected_conditions.presence_of_element_located(
+            (By.XPATH, "//android.widget.RelativeLayout/android.view.View/android.support.v7.widget.LinearLayoutCompat/android.widget.TextView[@index='1']"))
+        WebDriverWait(driver, 20).until(visible)
+    except TimeoutException:
+        print "Timed out waiting for page to load"
+    driver.find_element_by_xpath("//android.widget.RelativeLayout/android.view.View/android.support.v7.widget.LinearLayoutCompat/android.widget.TextView[@index='1']").click()
+    driver.find_element_by_xpath("//android.widget.TextView[@text='Preview & Test']").click()
+
+    # Attempting questions in preview
+    # try:
+    #     visible = expected_conditions.presence_of_element_located(
+    #         (By.XPATH,
+    #          "//android.widget.EditText[@text='1. Tell us about infobeans']"))
+    #     WebDriverWait(driver, 20).until(visible)
+    # except TimeoutException:
+    #     print "Timed out waiting for page to load"
+    # driver.find_element_by_xpath("//android.widget.EditText[@text='1. Tell us about infobeans']").send_keys("Creating Wow")
+    # driver.find_element_by_xpath("//android.widget.Spinner[@content-desc='2. Are you a tester?']").click()
+    # driver.find_element_by_xpath("//android.widget.Button[@content-desc='Done']").click()
+
+    # Teardown
+    driver.quit()
+    logger.info("Survey created with 4 questions")
+    logger.info("Testcase 1 passed")
+    assert True
+
+# Testcase 2 : This test will be failed forcefully
+def test_forcefullyFailedTestcase():
+    # create dictionary for capabilities
+    desired_caps = {}
+    desired_caps['platformName'] = 'Android'
+    desired_caps['platformVersion'] = '5.1.1'
+    desired_caps['deviceName'] = 'Android emulator'
+    desired_caps['appPackage'] = 'com.surveymonkey'
+    desired_caps['appActivity'] = 'com.surveymonkey.login.activities.LandingActivity'
+
+    # Set up connection with hub (grid) / appium server
+    driver = webdriver.Remote('http://localhost:4444/wd/hub', desired_caps)
+
+    logger.info("Executing Testcase 2.............")
+    # waiting for create survey button
+    try:
+        visible = expected_conditions.presence_of_element_located(
+            (By.CLASS_NAME, "android.widget.Button"))
+        WebDriverWait(driver, 30).until(visible)
+    except TimeoutException:
+        logger.error("Unable to load a surveymonkey app.")
+
+    # create survey
+    driver.find_element_by_class_name("android.widget.Button").click()
+    driver.find_element_by_xpath("//android.widget.Button[@text='New Survey']").click()
+    driver.find_element_by_id("com.surveymonkey:id/input_field").clear()
+    driver.find_element_by_id("com.surveymonkey:id/input_field").send_keys("Survey 2")
+    # Taking screenshot
+    screen_shot(driver)
+    driver.find_element_by_xpath("//android.widget.Button[@text='Create']").click()
+
+    # Teardown
+    driver.quit()
+    logger.error("Testcase 2 failed")
+    # Forcefully failed
+    assert False
+
+# Testcase 3 : This test will create a empty survey
+def test_createBlankSurvey():
+    # create dictionary for capabilities
+    desired_caps = {}
+    desired_caps['platformName'] = 'Android'
+    desired_caps['platformVersion'] = '5.1.1'
+    desired_caps['deviceName'] = 'Android emulator'
+    desired_caps['appPackage'] = 'com.surveymonkey'
+    desired_caps['appActivity'] = 'com.surveymonkey.login.activities.LandingActivity'
+
+    # Set up connection with hub (grid) / appium server
+    driver = webdriver.Remote('http://localhost:4444/wd/hub', desired_caps)
+
+    logger.info("Executing Testcase 3.............")
+
+    # waiting for create survey button
+    try:
+        visible = expected_conditions.presence_of_element_located(
+            (By.XPATH, "//android.widget.Button[@content-desc='CREATE SURVEY']"))
+        WebDriverWait(driver, 30).until(visible)
+    except TimeoutException:
+        logger.error("Unable to load a surveymonkey app.")
+
+    # create empty survey
+    driver.find_element_by_xpath("//android.widget.Button[@content-desc='CREATE SURVEY']").click()
+    driver.find_element_by_xpath("//android.widget.Button[@text='New Survey']").click()
+    driver.find_element_by_id("com.surveymonkey:id/input_field").clear()
+    driver.find_element_by_id("com.surveymonkey:id/input_field").send_keys("Survey 3")
+    driver.find_element_by_xpath("//android.widget.Button[@text='Create']").click()
+
+    # Teardown
+    driver.quit()
+    logger.info("Survey created")
+    logger.info("Testcase 3 passed")
+    assert True
+
+# Testcase 4 : This test will sign-out user login
+def test_userSignOut():
+    # create dictionary for capabilities
+    desired_caps = {}
+    desired_caps['platformName'] = 'Android'
+    desired_caps['platformVersion'] = '5.1.1'
+    desired_caps['deviceName'] = 'Android emulator'
+    desired_caps['appPackage'] = 'com.surveymonkey'
+    desired_caps['appActivity'] = 'com.surveymonkey.login.activities.LandingActivity'
+
+    # Set up connection with hub (grid) / appium server
+    driver = webdriver.Remote('http://localhost:4444/wd/hub', desired_caps)
+
+    logger.info("Executing Testcase 4.............")
+
+    # waiting for create survey button
+    try:
+        visible = expected_conditions.presence_of_element_located(
+            (By.XPATH, "//android.widget.Button[@content-desc='CREATE SURVEY']"))
+        WebDriverWait(driver, 30).until(visible)
+    except TimeoutException:
+        logger.error("Unable to load a surveymonkey app.")
+    # sign out
+    logger.info("Signing out..........")
+    driver.find_element_by_xpath("//android.widget.ImageButton[@content-desc='Navigate up']").click()
+    time.sleep(1)
+    driver.find_element_by_xpath("//android.widget.TextView[@index='2']").click()
+    # waiting for sign out button to appears
+    try:
+        visible = expected_conditions.presence_of_element_located(
+            (By.XPATH, "//android.widget.Button[@content-desc='SIGN OUT']"))
+        WebDriverWait(driver, 30).until(visible)
+    except TimeoutException:
+        logger.error("Unable to locate sign out button")
+    driver.find_element_by_xpath("//android.widget.Button[@content-desc='SIGN OUT']").click()
+
+    #Teardown
+    driver.quit()
+    logger.info("Successfully sign out")
+    logger.info("Testcase 3 passed")
+
+# Method used to take screenshot
+def screen_shot(driver):
+	screenshot = driver.get_screenshot_as_base64()
+	f = open('myfile1','w')
+	f.write(screenshot) # python will convert \n to os.linesep
+	f.close()
+
+
+
+

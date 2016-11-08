@@ -1,0 +1,37 @@
+import pytest
+import os
+
+def pytest_addoption(parser):
+    parser.addoption("--device", action="store", default="Android Emulator",
+        help="my option: Android Emulator or Android device")
+
+@pytest.fixture
+def deviceName(request):
+    return request.config.getoption("--device")
+
+
+@pytest.mark.hookwrapper
+def pytest_runtest_makereport(item, call):
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    outcome = yield
+    report = outcome.get_result()
+    extra = getattr(report, 'extra', [])
+    if report.when == 'call':
+        # always add url to report
+        #extra.append(pytest_html.extras.url('http://www.example.com/'))
+        xfail = hasattr(report, 'wasxfail')
+        if (report.skipped and xfail) or (report.failed and not xfail):
+                #url = TestSetup.selenium.current_url
+                #report.extra.append(extras.url(url))
+
+                if os.path.exists("myfile1"):
+                        file = open('myfile1', 'r')
+                        screenshot = file.read()
+                        os.remove("myfile1")
+                        extra.append(pytest_html.extras.image(screenshot, 'Screenshot'))
+
+                #screenshot = TestSetup.selenium.get_screenshot_as_base64()
+            # only add additional html on failure
+            #extra.append(pytest_html.extras.html('<div>Additional HTML</div>'))
+        report.extra = extra
+
