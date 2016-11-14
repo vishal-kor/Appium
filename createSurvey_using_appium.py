@@ -1,10 +1,10 @@
+# Import question builder class
 from library.question_types import QuestionBuilder
-
+import pytest
 # Importing setlog file for logging purpose
 from library.setlog import Logger
-
 loggerObj = Logger()
-logger = loggerObj.setLogger("Results/logs")
+logger = loggerObj.setLogger("logs")
 
 # Testcase 1 : This testcase will sign-in and create survey with 4 questions
 def test_createSurveyWithFiveQuestions(setUp,codexFile):
@@ -76,6 +76,7 @@ def test_createSurveyWithFiveQuestions(setUp,codexFile):
         QB.tearDown()
 
 
+@pytest.mark.only
 # Testcase 2 : This test will be failed forcefully
 def test_forcefullyFailedTestcase(setUp,codexFile):
     driver = setUp
@@ -88,12 +89,14 @@ def test_forcefullyFailedTestcase(setUp,codexFile):
         assert rv
     else:
         logger.info("Survey created")
+        screen_shot(driver)
         QB.tearDown()
 
     # Forcefully failed
     assert False
 
 
+@pytest.mark.only
 # Testcase 3 : This test will create a empty survey
 def test_createBlankSurvey(setUp, codexFile):
     driver = setUp
@@ -139,7 +142,4 @@ def screen_shot(driver):
     f = open('myfile1', 'w')
     f.write(screenshot)  # python will convert \n to os.linesep
     f.close()
-
-
-
 
