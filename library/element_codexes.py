@@ -30,7 +30,7 @@ class ElementCodex:
             return False
 
     def read_codex(self, input_file):
-        codex_file_path = os.path.abspath(os.path.join("/home/vishal/appiumDemo/clone_appiumScripts/resources/",input_file))
+        codex_file_path = os.path.abspath(os.path.join("/home/vishal/gitrepo/appiumDemo/resources/",input_file))
         codex_filestream = open(codex_file_path, 'r')
         for line in codex_filestream:
             # if the line is empty, skip

@@ -166,6 +166,80 @@ class QuestionBuilder():
             return rv
         return True
 
+    def web_addNextQuestionClick(self):
+        rv = self.waitForElement("addNextQuestionButton")
+        if rv is False:
+            return rv
+        ele = self.getWebElement("addNextQuestionButton")
+        if ele is False:
+            return False
+        ele.click()
+
+    def web_getDropdownMenuForQues(self):
+        rv = self.waitForElement("changeQuesTypeDropdownButton")
+        if rv is False:
+            return rv
+        ele = self.getWebElement("changeQuesTypeDropdownButton")
+        if ele is False:
+            return False
+        ele.click()
+
+    def web_addSingleTextTypeOfQueUsingAddNextQueButton(self, question_title):
+        rv = self.web_addNextQuestionClick()
+        if rv is False:
+            return rv
+        rv = self.web_getDropdownMenuForQues()
+        if rv is False:
+            return rv
+        ele = self.getWebElement("selectSingleTextQueUsingDropdown")
+        ele.click()
+        ele = self.getWebElement("enterQuesTitle")
+        ele.send_keys(question_title)
+        rv = self.saveAnyTypeOfQuestion()
+        if rv is False:
+            return rv
+        return True
+
+    def web_addMultipleChoiceTypeOfQueUsingAddNextQueButton(self, question_title):
+        time.sleep(3)
+        rv = self.web_addNextQuestionClick()
+        if rv is False:
+            return rv
+        rv = self.waitForElement("enterQuesTitle")
+        if rv is False:
+            return rv
+        ele = self.getWebElement("enterQuesTitle")
+        ele.send_keys(question_title)
+        ele = self.getWebElement("multipleChoiceQueRow1")
+        ele.send_keys("Regularly")
+        ele = self.getWebElement("multipleChoiceQueRow2")
+        ele.send_keys("Sometimes")
+        ele = self.getWebElement("multipleChoiceQueRow3")
+        ele.send_keys("Never Tried")
+        rv = self.saveAnyTypeOfQuestion()
+        if rv is False:
+            return rv
+        return True
+
+    def web_addDropDownTypeOfQueUsingAddNextQueButton(self, question_title):
+        time.sleep(3)
+        rv = self.web_addNextQuestionClick()
+        if rv is False:
+            return rv
+        rv = self.waitForElement("enterQuesTitle")
+        if rv is False:
+            return rv
+        ele = self.getWebElement("enterQuesTitle")
+        ele.send_keys(question_title)
+        ele = self.getWebElement("dropDownQueTypeRow1")
+        ele.send_keys("Yes")
+        ele = self.getWebElement("dropDownQueTypeRow2")
+        ele.send_keys("No")
+        rv = self.saveAnyTypeOfQuestion()
+        if rv is False:
+            return rv
+        return True
+
     def addCommentBoxTypeOfQuestion(self,question_title):
         rv = self.openQuestionContainer()
         if rv is False:
@@ -244,6 +318,14 @@ class QuestionBuilder():
 
 
     def saveAnyTypeOfQuestion(self):
+        ele = self.getWebElement("saveQuestion")
+        if ele is None:
+            return False
+        else:
+            ele.click()
+            return True
+
+    def web_saveAnyTypeOfQuestion(self):
         ele = self.getWebElement("saveQuestion")
         if ele is None:
             return False
